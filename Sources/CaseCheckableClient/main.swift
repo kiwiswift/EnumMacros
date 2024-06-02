@@ -1,8 +1,16 @@
 import CaseCheckable
 
-let a = 17
-let b = 25
+@CaseCheckable
+enum TestCase {
+    case firstOption(firstValue: String)
+    case secondOption(secondValue: String, thirdValue: Int)
+    case thirdOpton(firstValue: String, secondValue: String)
+    case fourthOption
+}
 
-let (result, code) = #stringify(a + b)
 
-print("The value \(result) was produced by the code \"\(code)\"")
+let enumValue = TestCase.thirdOpton(firstValue: "first", secondValue: "second")
+print(enumValue.isThirdopton)
+print(enumValue.firstValue)
+print(enumValue.secondValue)
+print(enumValue.thirdValue)
