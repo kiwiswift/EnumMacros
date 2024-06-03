@@ -1,4 +1,4 @@
-import CaseCheckable
+import EnumMacros
 
 @CaseCheckable
 enum TestCase {

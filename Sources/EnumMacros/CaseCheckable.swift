@@ -75,4 +75,4 @@
 /// by their parameter names.
 /// 
 @attached(member, names: arbitrary)
-public macro CaseCheckable() = #externalMacro(module: "CaseCheckableMacros", type: "CaseCheckableMacro")
+public macro CaseCheckable() = #externalMacro(module: "EnumMacrosImplementation", type: "CaseCheckableMacro")

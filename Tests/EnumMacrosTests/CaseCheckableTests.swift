@@ -6,8 +6,8 @@ import XCTest
 import MacroTesting
 
 // Macro implementations build for the host, so the corresponding module is not available when cross-compiling. Cross-compiled tests may still make use of the macro itself in end-to-end tests.
-#if canImport(CaseCheckableMacros)
-import CaseCheckableMacros
+#if canImport(EnumMacrosImplementation)
+import EnumMacrosImplementation
 
 let testMacros: [String: Macro.Type] = [
     "CaseCheckable": CaseCheckableMacro.self,
@@ -22,7 +22,7 @@ final class CaseCheckableTests: XCTestCase {
         }
     }
     func testMacro() throws {
-        #if canImport(CaseCheckableMacros)
+        #if canImport(EnumMacrosImplementation)
         
         assertMacro {
             """
