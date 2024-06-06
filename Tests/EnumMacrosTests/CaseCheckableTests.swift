@@ -8,168 +8,102 @@ import MacroTesting
 // Macro implementations build for the host, so the corresponding module is not available when cross-compiling. Cross-compiled tests may still make use of the macro itself in end-to-end tests.
 #if canImport(EnumMacrosImplementation)
 import EnumMacrosImplementation
-
-let testMacros: [String: Macro.Type] = [
-    "CaseCheckable": CaseCheckableMacro.self,
-]
 #endif
 
 final class CaseCheckableTests: XCTestCase {
 
     override func invokeTest() {
-        withMacroTesting(macros: [CaseCheckableMacro.self]) {
+        withMacroTesting(isRecording: false,
+                         macros: [CaseCheckableMacro.self]) {
             super.invokeTest()
         }
     }
-    func testMacro() throws {
+    func test_EnumWithCaseCheckableMacro() throws {
         #if canImport(EnumMacrosImplementation)
         
         assertMacro {
             """
-            enum TestCase {
-                case firstOption(firstValue: String)
-                case secondOption(secondValue: String, thirdValue: Int)
-                case thirdOpton(firstValue: String, secondValue: String)
-                case fourthOption
-            
-                var isFirstoption: Bool {
-                    switch self {
-                        case .firstOption:
-                            true
-                        default:
-                            false
-                    }
-                }
-            
-                var isSecondoption: Bool {
-                    switch self {
-                        case .secondOption:
-                            true
-                        default:
-                            false
-                    }
-                }
-            
-                var isThirdopton: Bool {
-                    switch self {
-                        case .thirdOpton:
-                            true
-                        default:
-                            false
-                    }
-                }
-            
-                var isFourthoption: Bool {
-                    switch self {
-                        case .fourthOption:
-                            true
-                        default:
-                            false
-                    }
-                }
-            
-                var firstValue: String? {
-                    switch self {
-                    case .firstOption(let firstValue):
-                        return firstValue
-                    case .thirdOpton(let firstValue, _):
-                        return firstValue
-                        default:
-                        return nil
-                    }
-                }
-            
-                var thirdValue: Int? {
-                    switch self {
-                    case .secondOption(_, let thirdValue):
-                        return thirdValue
-                        default:
-                        return nil
-                    }
-                }
-            
-                var secondValue: String? {
-                    switch self {
-                    case .secondOption(let secondValue, _):
-                        return secondValue
-                    case .thirdOpton(_, let secondValue):
-                        return secondValue
-                        default:
-                        return nil
-                    }
-                }
+            @CaseCheckable
+            enum NetworkResponse {
+                case loaded(data: Data)
+                case partiallyLoaded(data: Data, error: Error)
+                case failure(error: Error)
+                case loading
+                case noConnection
             }
+
             """
         } expansion: {
             """
-            enum TestCase {
-                case firstOption(firstValue: String)
-                case secondOption(secondValue: String, thirdValue: Int)
-                case thirdOpton(firstValue: String, secondValue: String)
-                case fourthOption
+            enum NetworkResponse {
+                case loaded(data: Data)
+                case partiallyLoaded(data: Data, error: Error)
+                case failure(error: Error)
+                case loading
+                case noConnection
 
-                var isFirstoption: Bool {
+                var isLoaded: Bool {
                     switch self {
-                        case .firstOption:
+                        case .loaded:
                             true
                         default:
                             false
                     }
                 }
 
-                var isSecondoption: Bool {
+                var isPartiallyLoaded: Bool {
                     switch self {
-                        case .secondOption:
+                        case .partiallyLoaded:
                             true
                         default:
                             false
                     }
                 }
 
-                var isThirdopton: Bool {
+                var isFailure: Bool {
                     switch self {
-                        case .thirdOpton:
+                        case .failure:
                             true
                         default:
                             false
                     }
                 }
 
-                var isFourthoption: Bool {
+                var isLoading: Bool {
                     switch self {
-                        case .fourthOption:
+                        case .loading:
                             true
                         default:
                             false
                     }
                 }
 
-                var firstValue: String? {
+                var isNoConnection: Bool {
                     switch self {
-                    case .firstOption(let firstValue):
-                        return firstValue
-                    case .thirdOpton(let firstValue, _):
-                        return firstValue
+                        case .noConnection:
+                            true
+                        default:
+                            false
+                    }
+                }
+
+                var data: Data? {
+                    switch self {
+                    case .loaded(let data):
+                        return data
+                    case .partiallyLoaded(let data, _):
+                        return data
                         default:
                         return nil
                     }
                 }
 
-                var thirdValue: Int? {
+                var error: Error? {
                     switch self {
-                    case .secondOption(_, let thirdValue):
-                        return thirdValue
-                        default:
-                        return nil
-                    }
-                }
-
-                var secondValue: String? {
-                    switch self {
-                    case .secondOption(let secondValue, _):
-                        return secondValue
-                    case .thirdOpton(_, let secondValue):
-                        return secondValue
+                    case .partiallyLoaded(_, let error):
+                        return error
+                    case .failure(let error):
+                        return error
                         default:
                         return nil
                     }
@@ -180,5 +114,36 @@ final class CaseCheckableTests: XCTestCase {
         #else
         throw XCTSkip("macros are only supported when running tests for the host platform")
         #endif
+    }
+
+    func test_CaseWithMacro() {
+    #if canImport(EnumMacrosImplementation)
+
+        assertMacro {
+            """
+            enum NetworkResponse {
+                case loaded(data: Data)
+                @CaseCheckable
+                case partiallyLoaded(data: Data, error: Error)
+                case failure(error: Error)
+                case loading
+                case noConnection
+            }
+
+            """
+        } expansion: {
+            """
+            enum NetworkResponse {
+                case loaded(data: Data)
+                case partiallyLoaded(data: Data, error: Error)
+                case failure(error: Error)
+                case loading
+                case noConnection
+            }
+            """
+        }
+    #else
+        throw XCTSkip("macros are only supported when running tests for the host platform")
+    #endif
     }
 }

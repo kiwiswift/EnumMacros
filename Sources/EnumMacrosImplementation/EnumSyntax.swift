@@ -9,12 +9,17 @@ import SwiftSyntax
 
 struct EnumSyntax {
     struct CaseSyntax {
-        struct ParameterSyntax: Hashable {
+        struct ParameterSyntax: Hashable, Comparable {
+
             let name: String?
             let typeName: String
             init(declaration: EnumCaseParameterSyntax) {
                 self.name = declaration.firstName?.text
                 self.typeName = declaration.type.description
+            }
+
+            static func < (lhs: EnumSyntax.CaseSyntax.ParameterSyntax, rhs: EnumSyntax.CaseSyntax.ParameterSyntax) -> Bool {
+                lhs.name ?? "" < rhs.name ?? ""
             }
         }
         let name: String
@@ -22,7 +27,7 @@ struct EnumSyntax {
 
         var caseCheck: DeclSyntax {
             """
-            var is\(raw: name.capitalized): Bool {
+            var is\(raw: name.capitalisedFirstLetter): Bool {
                 switch self {
                     case .\(raw: name):
                         true
@@ -64,7 +69,7 @@ struct EnumSyntax {
     var parametesValueGetter: [DeclSyntax] {
         let parameters = cases.flatMap { $0.parameters }
         // TODO: Handle error when no parameters are found or when a parameter with same name has two types
-        let parametersSyntax: [DeclSyntax] = Set(parameters).compactMap { parameter in
+        let parametersSyntax: [DeclSyntax] = Set(parameters).sorted().compactMap { parameter in
             guard let parameterName = parameter.name else { return nil }
             let casesWithParameter = cases.compactMap { $0.switchCaseWithValueBindingSyntax(forArgumentWithName: parameterName) }.joined(separator: "\n")
             return

@@ -10,7 +10,7 @@ enum TestCase {
 
 
 let enumValue = TestCase.thirdOpton(firstValue: "first", secondValue: "second")
-print(enumValue.isThirdopton)
+print(enumValue.isThirdOpton)
 print(enumValue.firstValue)
 print(enumValue.secondValue)
 print(enumValue.thirdValue)

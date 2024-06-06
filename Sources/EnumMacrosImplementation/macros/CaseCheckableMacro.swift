@@ -8,19 +8,14 @@ public struct CaseCheckableMacro: MemberMacro {
                                  providingMembersOf declaration: some DeclGroupSyntax,
                                  in context: some MacroExpansionContext) throws -> [DeclSyntax] {
 
-        guard let enumDeclaration = declaration.as(EnumDeclSyntax.self)
-        else {
-            fatalError("Only enums allowed")
+        guard let enumDeclaration = declaration.as(EnumDeclSyntax.self) else {
+            throw MacroError.onlyApplicableToEnum(macroName: "CaseCheckable")
         }
 
         let enumSyntax = EnumSyntax(declaration: enumDeclaration)
-        return enumSyntax.cases.map(\.caseCheck) + enumSyntax.parametesValueGetter
-    }
-}
 
-@main
-struct CaseCheckablePlugin: CompilerPlugin {
-    let providingMacros: [Macro.Type] = [
-        CaseCheckableMacro.self,
-    ]
+        let casesCheck = enumSyntax.cases.map(\.caseCheck)
+        let parametersGetters = enumSyntax.parametesValueGetter
+        return casesCheck + parametersGetters
+    }
 }
