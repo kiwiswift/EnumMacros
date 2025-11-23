@@ -13,7 +13,7 @@ import EnumMacrosImplementation
 final class CaseCheckableTests: XCTestCase {
 
     override func invokeTest() {
-        withMacroTesting(isRecording: false,
+        withMacroTesting(record: false,
                          macros: [CaseCheckableMacro.self]) {
             super.invokeTest()
         }
